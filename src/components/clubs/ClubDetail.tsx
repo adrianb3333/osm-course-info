@@ -12,9 +12,9 @@ export default function ClubDetail({ club, onClose }: Props) {
   const [data, setData] = useState<GuideResponse | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // Parent renders <ClubDetail key={club.id} />, so this component remounts on club change.
+  // No synchronous setState needed — initial state (loading=true, data=null) is correct on mount.
   useEffect(() => {
-    setData(null)
-    setLoading(true)
     fetch(`/api/clubs/${club.id}/guide`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { setData(d); setLoading(false) })

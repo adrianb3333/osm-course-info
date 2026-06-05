@@ -44,7 +44,7 @@ export default function LeafletMap() {
       {/* Side panel — slides in from the right when a club is selected */}
       {selected && (
         <div className="absolute top-0 right-0 h-full w-full sm:w-[420px] bg-white shadow-2xl overflow-y-auto z-[1000] border-l border-gray-100">
-          <ClubDetail club={selected} onClose={() => setSelected(null)} />
+          <ClubDetail key={selected.id} club={selected} onClose={() => setSelected(null)} />
         </div>
       )}
     </div>
