@@ -6,6 +6,14 @@ import 'leaflet/dist/leaflet.css'
 import type { Club } from '@/lib/types'
 import ClubDetail from '@/components/clubs/ClubDetail'
 
+// Approximate check — OSM bounding box includes ~86 Norwegian/Danish/Finnish border clubs
+function isInSweden(lat: number, lon: number): boolean {
+  if (lat < 55.2 || lat > 69.2 || lon < 10.5 || lon > 24.3) return false
+  if (lat < 57.0 && lon < 12.5) return false  // Denmark / Jutland area
+  if (lat < 63.0 && lon < 11.0) return false  // Norwegian west coast
+  return true
+}
+
 export default function LeafletMap() {
   const [clubs, setClubs] = useState<Club[]>([])
   const [selected, setSelected] = useState<Club | null>(null)
@@ -33,6 +41,8 @@ export default function LeafletMap() {
             pathOptions={{
               fillColor: selected?.id === club.id
                 ? '#f59e0b'
+                : !isInSweden(club.lat, club.lon)
+                ? '#ec4899'
                 : club.has_images ? '#15803d' : '#dc2626',
               fillOpacity: 0.9,
               color: '#ffffff',
