@@ -17,9 +17,16 @@ export default function ClubListItem({ club, selected, onClick }: Props) {
             : 'hover:bg-gray-50 border-l-4 border-l-transparent'
         }`}
       >
-        <p className={`text-sm font-medium leading-tight ${selected ? 'text-green-800' : 'text-gray-800'}`}>
-          {club.name}
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <p className={`text-sm font-medium leading-tight ${selected ? 'text-green-800' : 'text-gray-800'}`}>
+            {club.name}
+          </p>
+          {!club.has_images && (
+            <span className="text-red-500 text-xs font-bold flex-shrink-0 mt-0.5" title="Ingen banguide tillgänglig">
+              ✕
+            </span>
+          )}
+        </div>
         {(club.city || club.num_holes) && (
           <p className="text-xs text-gray-400 mt-0.5">
             {[club.city, club.num_holes ? `${club.num_holes} hål` : null]

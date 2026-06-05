@@ -11,6 +11,7 @@ export type Club = {
   city: string | null
   region: string | null
   num_holes: number | null
+  has_images: boolean
 }
 
 export type CourseGuide = {

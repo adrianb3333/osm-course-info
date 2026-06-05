@@ -31,7 +31,9 @@ export default function LeafletMap() {
             center={[club.lat, club.lon]}
             radius={6}
             pathOptions={{
-              fillColor: selected?.id === club.id ? '#f59e0b' : '#15803d',
+              fillColor: selected?.id === club.id
+                ? '#f59e0b'
+                : club.has_images ? '#15803d' : '#dc2626',
               fillOpacity: 0.9,
               color: '#ffffff',
               weight: 1.5,
