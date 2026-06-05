@@ -25,6 +25,21 @@ export type CourseGuide = {
   booking_url: string | null
   hero_image_url: string | null
   source_url: string | null
+  guide_url: string | null
   scraped_at: string | null
   scrape_status: string | null
+}
+
+export type Hole = {
+  hole_number: number
+  par: number | null
+  distance_m: number | null
+  distance_y: number | null
+  handicap: number | null
+  description: string | null
+}
+
+export type GuideResponse = {
+  guide: CourseGuide | null
+  holes: Hole[]
 }

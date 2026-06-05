@@ -1,71 +1,52 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, CircleMarker } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Club } from '@/lib/types'
+import ClubDetail from '@/components/clubs/ClubDetail'
 
 export default function LeafletMap() {
   const [clubs, setClubs] = useState<Club[]>([])
+  const [selected, setSelected] = useState<Club | null>(null)
 
   useEffect(() => {
-    fetch('/api/clubs')
-      .then((r) => r.json())
-      .then(setClubs)
+    fetch('/api/clubs').then((r) => r.json()).then(setClubs)
   }, [])
 
   return (
-    <MapContainer
-      center={[62.5, 16.0]}
-      zoom={5}
-      style={{ height: 'calc(100vh - 48px)', width: '100%' }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
-      {clubs.map((club) => (
-        <CircleMarker
-          key={club.id}
-          center={[club.lat, club.lon]}
-          radius={6}
-          pathOptions={{
-            fillColor: '#15803d',
-            fillOpacity: 0.85,
-            color: '#ffffff',
-            weight: 1.5,
-          }}
-        >
-          <Popup>
-            <strong className="text-green-800">{club.name}</strong>
-            {club.city && (
-              <>
-                <br />
-                <span className="text-gray-500 text-xs">{club.city}</span>
-              </>
-            )}
-            {club.num_holes && (
-              <>
-                <br />
-                <span className="text-xs">{club.num_holes} hål</span>
-              </>
-            )}
-            {club.website && (
-              <>
-                <br />
-                <a
-                  href={club.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-green-700 text-xs underline"
-                >
-                  Webbplats
-                </a>
-              </>
-            )}
-          </Popup>
-        </CircleMarker>
-      ))}
-    </MapContainer>
+    <div className="relative" style={{ height: 'calc(100vh - 48px)' }}>
+      <MapContainer
+        center={[62.5, 16.0]}
+        zoom={5}
+        style={{ height: '100%', width: '100%' }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        {clubs.map((club) => (
+          <CircleMarker
+            key={club.id}
+            center={[club.lat, club.lon]}
+            radius={6}
+            pathOptions={{
+              fillColor: selected?.id === club.id ? '#f59e0b' : '#15803d',
+              fillOpacity: 0.9,
+              color: '#ffffff',
+              weight: 1.5,
+            }}
+            eventHandlers={{ click: () => setSelected(club) }}
+          />
+        ))}
+      </MapContainer>
+
+      {/* Side panel — slides in from the right when a club is selected */}
+      {selected && (
+        <div className="absolute top-0 right-0 h-full w-full sm:w-[420px] bg-white shadow-2xl overflow-y-auto z-[1000] border-l border-gray-100">
+          <ClubDetail club={selected} onClose={() => setSelected(null)} />
+        </div>
+      )}
+    </div>
   )
 }
