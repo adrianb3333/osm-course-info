@@ -11,12 +11,12 @@ export async function GET(
   const [guideRes, holesRes] = await Promise.all([
     supabase
       .from('course_guides')
-      .select('*')
+      .select('id, club_id, description, par, slope_rating, course_rating, green_fee_from, booking_url, hero_image_url, course_map_url, source_url, guide_url, scraped_at, scrape_status')
       .eq('club_id', id)
       .single(),
     supabase
       .from('holes')
-      .select('hole_number, par, distance_m, distance_y, handicap, description')
+      .select('hole_number, par, distance_m, distance_y, handicap, description, image_url')
       .eq('club_id', id)
       .order('hole_number'),
   ])

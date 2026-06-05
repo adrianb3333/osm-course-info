@@ -47,7 +47,6 @@ export default function ClubDetail({ club, onClose }: Props) {
         </p>
       )}
 
-      {/* Website link */}
       {club.website && (
         <a
           href={club.website}
@@ -63,15 +62,25 @@ export default function ClubDetail({ club, onClose }: Props) {
 
       {!loading && (
         <>
-          {/* Hero image */}
-          {guide?.hero_image_url && (
-            // eslint-disable-next-line @next/next/no-img-element
+          {/* Course map overview image */}
+          {guide?.course_map_url ? (
+            <div className="mb-5">
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Banöversikt</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={guide.course_map_url}
+                alt={`${club.name} – banöversikt`}
+                className="w-full rounded-xl border border-gray-100 object-contain max-h-72 bg-gray-50"
+              />
+            </div>
+          ) : guide?.hero_image_url ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={guide.hero_image_url}
               alt={club.name}
               className="w-full h-44 object-cover rounded-xl mb-4"
             />
-          )}
+          ) : null}
 
           {/* Description */}
           {guide?.description && (
@@ -94,7 +103,9 @@ export default function ClubDetail({ club, onClose }: Props) {
           {holes.length > 0 ? (
             <div className="mt-2">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-green-800 text-sm">Banguide – Hålinformation</h3>
+                <h3 className="font-semibold text-green-800 text-sm">
+                  Banguide – Hålinformation
+                </h3>
                 {guide?.guide_url && (
                   <a
                     href={guide.guide_url}
@@ -106,58 +117,35 @@ export default function ClubDetail({ club, onClose }: Props) {
                   </a>
                 )}
               </div>
-              <div className="overflow-x-auto rounded-lg border border-gray-100">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-green-700 text-white">
-                      <th className="px-3 py-2 text-center font-medium">Hål</th>
-                      <th className="px-3 py-2 text-center font-medium">Par</th>
-                      <th className="px-3 py-2 text-center font-medium">Meter</th>
-                      <th className="px-3 py-2 text-center font-medium">HCP</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {holes.map((hole, i) => (
-                      <HoleRow key={hole.hole_number} hole={hole} alt={i % 2 === 1} />
-                    ))}
-                  </tbody>
-                  {holes.length >= 9 && (
-                    <tfoot>
-                      <tr className="bg-green-50 font-semibold text-green-900 border-t border-green-200">
-                        <td className="px-3 py-2 text-center">Total</td>
-                        <td className="px-3 py-2 text-center">{totalPar || '–'}</td>
-                        <td className="px-3 py-2 text-center">{totalDist || '–'}</td>
-                        <td className="px-3 py-2 text-center">–</td>
-                      </tr>
-                    </tfoot>
-                  )}
-                </table>
-              </div>
+
+              {/* Show hole cards if we have images, otherwise compact table */}
+              {holes.some((h) => h.image_url) ? (
+                <HoleCards holes={holes} />
+              ) : (
+                <HoleTable holes={holes} totalPar={totalPar} totalDist={totalDist} />
+              )}
             </div>
           ) : (
-            !loading && (
-              <div className="mt-3 text-gray-400 text-sm italic">
-                {guide
-                  ? 'Banguide hittad men ingen håltabell kunde läsas – besök klubbens webbplats.'
-                  : 'Ingen banguide tillgänglig ännu.'}
-                {guide?.guide_url && (
-                  <>
-                    {' '}
-                    <a
-                      href={guide.guide_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-green-600 not-italic hover:underline"
-                    >
-                      Öppna banguide →
-                    </a>
-                  </>
-                )}
-              </div>
-            )
+            <div className="mt-3 text-gray-400 text-sm italic">
+              {guide
+                ? 'Banguide hittad – besök klubbens webbplats för hålinformation.'
+                : 'Ingen banguide tillgänglig ännu.'}
+              {guide?.guide_url && (
+                <>
+                  {' '}
+                  <a
+                    href={guide.guide_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-green-600 not-italic hover:underline"
+                  >
+                    Öppna banguide →
+                  </a>
+                </>
+              )}
+            </div>
           )}
 
-          {/* Booking button */}
           {guide?.booking_url && (
             <a
               href={guide.booking_url}
@@ -174,18 +162,111 @@ export default function ClubDetail({ club, onClose }: Props) {
   )
 }
 
-function HoleRow({ hole, alt }: { hole: Hole; alt: boolean }) {
+// ── Hole cards — used when images are available ──────────────────────────────
+
+function HoleCards({ holes }: { holes: Hole[] }) {
   return (
-    <tr className={alt ? 'bg-gray-50' : 'bg-white'}>
-      <td className="px-3 py-1.5 text-center font-medium text-gray-700">{hole.hole_number}</td>
-      <td className={`px-3 py-1.5 text-center font-semibold ${
-        hole.par === 3 ? 'text-blue-600' : hole.par === 5 ? 'text-orange-600' : 'text-gray-800'
-      }`}>
-        {hole.par ?? '–'}
-      </td>
-      <td className="px-3 py-1.5 text-center text-gray-600">{hole.distance_m ?? '–'}</td>
-      <td className="px-3 py-1.5 text-center text-gray-500">{hole.handicap ?? '–'}</td>
-    </tr>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {holes.map((hole) => (
+        <div
+          key={hole.hole_number}
+          className="rounded-xl border border-gray-100 overflow-hidden bg-white shadow-sm"
+        >
+          {hole.image_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={hole.image_url}
+              alt={`Hål ${hole.hole_number}`}
+              className="w-full h-36 object-cover bg-gray-50"
+            />
+          )}
+          <div className="flex items-center gap-4 px-3 py-2">
+            <span className="text-xl font-bold text-green-800 w-8 text-center">
+              {hole.hole_number}
+            </span>
+            <div className="flex gap-4 text-sm">
+              {hole.par && (
+                <span>
+                  <span className="text-gray-400 text-xs">Par </span>
+                  <span className={`font-semibold ${
+                    hole.par === 3 ? 'text-blue-600' : hole.par === 5 ? 'text-orange-600' : 'text-gray-800'
+                  }`}>{hole.par}</span>
+                </span>
+              )}
+              {hole.distance_m && (
+                <span>
+                  <span className="text-gray-400 text-xs">Meter </span>
+                  <span className="font-medium text-gray-700">{hole.distance_m}</span>
+                </span>
+              )}
+              {hole.handicap && (
+                <span>
+                  <span className="text-gray-400 text-xs">HCP </span>
+                  <span className="font-medium text-gray-600">{hole.handicap}</span>
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ── Compact table — used when no images available ─────────────────────────────
+
+function HoleTable({
+  holes,
+  totalPar,
+  totalDist,
+}: {
+  holes: Hole[]
+  totalPar: number
+  totalDist: number
+}) {
+  return (
+    <div className="overflow-x-auto rounded-lg border border-gray-100">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-green-700 text-white">
+            <th className="px-3 py-2 text-center font-medium">Hål</th>
+            <th className="px-3 py-2 text-center font-medium">Par</th>
+            <th className="px-3 py-2 text-center font-medium">Meter</th>
+            <th className="px-3 py-2 text-center font-medium">HCP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {holes.map((hole, i) => (
+            <tr key={hole.hole_number} className={i % 2 === 1 ? 'bg-gray-50' : 'bg-white'}>
+              <td className="px-3 py-1.5 text-center font-medium text-gray-700">
+                {hole.hole_number}
+              </td>
+              <td className={`px-3 py-1.5 text-center font-semibold ${
+                hole.par === 3 ? 'text-blue-600' : hole.par === 5 ? 'text-orange-600' : 'text-gray-800'
+              }`}>
+                {hole.par ?? '–'}
+              </td>
+              <td className="px-3 py-1.5 text-center text-gray-600">
+                {hole.distance_m ?? '–'}
+              </td>
+              <td className="px-3 py-1.5 text-center text-gray-500">
+                {hole.handicap ?? '–'}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+        {holes.length >= 9 && (
+          <tfoot>
+            <tr className="bg-green-50 font-semibold text-green-900 border-t border-green-200">
+              <td className="px-3 py-2 text-center">Total</td>
+              <td className="px-3 py-2 text-center">{totalPar || '–'}</td>
+              <td className="px-3 py-2 text-center">{totalDist || '–'}</td>
+              <td className="px-3 py-2 text-center">–</td>
+            </tr>
+          </tfoot>
+        )}
+      </table>
+    </div>
   )
 }
 

@@ -24,6 +24,7 @@ export type CourseGuide = {
   green_fee_from: number | null
   booking_url: string | null
   hero_image_url: string | null
+  course_map_url: string | null
   source_url: string | null
   guide_url: string | null
   scraped_at: string | null
@@ -37,6 +38,7 @@ export type Hole = {
   distance_y: number | null
   handicap: number | null
   description: string | null
+  image_url: string | null
 }
 
 export type GuideResponse = {
