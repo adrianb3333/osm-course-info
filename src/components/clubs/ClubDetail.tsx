@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import type { Club, GuideResponse, Hole } from '@/lib/types'
+import ImageLightbox from '@/components/ui/ImageLightbox'
 
 type Props = {
   club: Club
@@ -120,7 +121,7 @@ export default function ClubDetail({ club, onClose }: Props) {
 
               {/* Show hole cards if we have images, otherwise compact table */}
               {holes.some((h) => h.image_url) ? (
-                <HoleCards holes={holes} />
+                <HoleCards holes={holes} clubName={club.name} />
               ) : (
                 <HoleTable holes={holes} totalPar={totalPar} totalDist={totalDist} />
               )}
@@ -164,52 +165,72 @@ export default function ClubDetail({ club, onClose }: Props) {
 
 // ── Hole cards — used when images are available ──────────────────────────────
 
-function HoleCards({ holes }: { holes: Hole[] }) {
+function HoleCards({ holes, clubName }: { holes: Hole[]; clubName: string }) {
+  const [lightbox, setLightbox] = useState<Hole | null>(null)
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      {holes.map((hole) => (
-        <div
-          key={hole.hole_number}
-          className="rounded-xl border border-gray-100 overflow-hidden bg-white shadow-sm"
-        >
-          {hole.image_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={hole.image_url}
-              alt={`Hål ${hole.hole_number}`}
-              className="w-full h-36 object-cover bg-gray-50"
-            />
-          )}
-          <div className="flex items-center gap-4 px-3 py-2">
-            <span className="text-xl font-bold text-green-800 w-8 text-center">
-              {hole.hole_number}
-            </span>
-            <div className="flex gap-4 text-sm">
-              {hole.par && (
-                <span>
-                  <span className="text-gray-400 text-xs">Par </span>
-                  <span className={`font-semibold ${
-                    hole.par === 3 ? 'text-blue-600' : hole.par === 5 ? 'text-orange-600' : 'text-gray-800'
-                  }`}>{hole.par}</span>
-                </span>
-              )}
-              {hole.distance_m && (
-                <span>
-                  <span className="text-gray-400 text-xs">Meter </span>
-                  <span className="font-medium text-gray-700">{hole.distance_m}</span>
-                </span>
-              )}
-              {hole.handicap && (
-                <span>
-                  <span className="text-gray-400 text-xs">HCP </span>
-                  <span className="font-medium text-gray-600">{hole.handicap}</span>
-                </span>
-              )}
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {holes.map((hole) => (
+          <div
+            key={hole.hole_number}
+            className="rounded-xl border border-gray-100 overflow-hidden bg-white shadow-sm"
+          >
+            {hole.image_url ? (
+              <button
+                onClick={() => setLightbox(hole)}
+                className="w-full block cursor-zoom-in"
+                aria-label={`Visa hål ${hole.hole_number} i helskärm`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={hole.image_url}
+                  alt={`${clubName} – hål ${hole.hole_number}`}
+                  className="w-full h-36 object-cover bg-gray-50 hover:opacity-90 transition-opacity"
+                />
+              </button>
+            ) : (
+              <div className="w-full h-36 bg-gray-50" />
+            )}
+            <div className="flex items-center gap-4 px-3 py-2">
+              <span className="text-xl font-bold text-green-800 w-8 text-center">
+                {hole.hole_number}
+              </span>
+              <div className="flex gap-4 text-sm">
+                {hole.par && (
+                  <span>
+                    <span className="text-gray-400 text-xs">Par </span>
+                    <span className={`font-semibold ${
+                      hole.par === 3 ? 'text-blue-600' : hole.par === 5 ? 'text-orange-600' : 'text-gray-800'
+                    }`}>{hole.par}</span>
+                  </span>
+                )}
+                {hole.distance_m && (
+                  <span>
+                    <span className="text-gray-400 text-xs">Meter </span>
+                    <span className="font-medium text-gray-700">{hole.distance_m}</span>
+                  </span>
+                )}
+                {hole.handicap && (
+                  <span>
+                    <span className="text-gray-400 text-xs">HCP </span>
+                    <span className="font-medium text-gray-600">{hole.handicap}</span>
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      {lightbox?.image_url && (
+        <ImageLightbox
+          src={lightbox.image_url}
+          alt={`${clubName} – hål ${lightbox.hole_number}`}
+          onClose={() => setLightbox(null)}
+        />
+      )}
+    </>
   )
 }
 
