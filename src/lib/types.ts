@@ -1,0 +1,30 @@
+export type Club = {
+  id: string
+  osm_id: number | null
+  name: string
+  short_name: string | null
+  lat: number
+  lon: number
+  website: string | null
+  phone: string | null
+  email: string | null
+  city: string | null
+  region: string | null
+  num_holes: number | null
+}
+
+export type CourseGuide = {
+  id: string
+  club_id: string
+  description: string | null
+  course_description_html: string | null
+  par: number | null
+  slope_rating: number | null
+  course_rating: number | null
+  green_fee_from: number | null
+  booking_url: string | null
+  hero_image_url: string | null
+  source_url: string | null
+  scraped_at: string | null
+  scrape_status: string | null
+}
