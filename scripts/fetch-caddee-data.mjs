@@ -228,8 +228,8 @@ async function main() {
     caddeeFound++
     const { club: caddeeClub } = caddeeResult
 
-    // Update website if missing
-    const caddeeWebsite = caddeeClub.website ?? null
+    // Update website if missing (Caddee uses 'url', not 'website')
+    const caddeeWebsite = caddeeClub.url ?? caddeeClub.website ?? null
     if (!club.website && caddeeWebsite) {
       await supabase.from('clubs').update({ website: caddeeWebsite }).eq('id', club.id)
       websitesAdded++
