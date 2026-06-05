@@ -166,7 +166,20 @@ export default function ClubDetail({ club, onClose }: Props) {
 // ── Hole cards — used when images are available ──────────────────────────────
 
 function HoleCards({ holes, clubName }: { holes: Hole[]; clubName: string }) {
-  const [lightbox, setLightbox] = useState<Hole | null>(null)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+
+  // Build the ordered list of holes that have images (for lightbox navigation)
+  const imageHoles = holes.filter((h) => h.image_url)
+  const lightboxImages = imageHoles.map((h) => ({
+    src: h.image_url!,
+    alt: `${clubName} – hål ${h.hole_number}`,
+    label: `Hål ${h.hole_number}`,
+  }))
+
+  function openLightbox(hole: Hole) {
+    const idx = imageHoles.findIndex((h) => h.hole_number === hole.hole_number)
+    if (idx !== -1) setLightboxIndex(idx)
+  }
 
   return (
     <>
@@ -178,7 +191,7 @@ function HoleCards({ holes, clubName }: { holes: Hole[]; clubName: string }) {
           >
             {hole.image_url ? (
               <button
-                onClick={() => setLightbox(hole)}
+                onClick={() => openLightbox(hole)}
                 className="w-full block cursor-zoom-in"
                 aria-label={`Visa hål ${hole.hole_number} i helskärm`}
               >
@@ -223,11 +236,11 @@ function HoleCards({ holes, clubName }: { holes: Hole[]; clubName: string }) {
         ))}
       </div>
 
-      {lightbox?.image_url && (
+      {lightboxIndex !== null && (
         <ImageLightbox
-          src={lightbox.image_url}
-          alt={`${clubName} – hål ${lightbox.hole_number}`}
-          onClose={() => setLightbox(null)}
+          images={lightboxImages}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
         />
       )}
     </>

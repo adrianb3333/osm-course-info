@@ -66,8 +66,7 @@ export default function NearbyCard({ club, distanceKm, hole1Image, selected, onC
 
       {lightbox && hole1Image && (
         <ImageLightbox
-          src={hole1Image}
-          alt={`${club.name} – hål 1`}
+          images={[{ src: hole1Image, alt: `${club.name} – hål 1`, label: 'Hål 1' }]}
           onClose={() => setLightbox(false)}
         />
       )}
