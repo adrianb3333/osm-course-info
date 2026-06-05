@@ -35,7 +35,10 @@ async function fetchGolfCourses() {
   console.log('Querying Overpass API for Swedish golf courses (this may take ~60s)...')
   const res = await fetch(OVERPASS_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'User-Agent': 'Mozilla/5.0 (compatible; osm-course-info/1.0)',
+    },
     body: `data=${encodeURIComponent(QUERY)}`,
   })
   if (!res.ok) throw new Error(`Overpass HTTP error: ${res.status} ${res.statusText}`)
